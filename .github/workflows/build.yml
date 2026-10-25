@@ -1,14 +1,13 @@
 name: Build PX4 for Tustin Mach
 
-  on:
+on:
     workflow_dispatch:
       inputs:
         px4_ref:
           description: "PX4-Autopilot 的 branch / tag / commit"
           required: false
           default: main
-
-  jobs:
+jobs:
     build:
       runs-on: ubuntu-22.04
       timeout-minutes: 120
