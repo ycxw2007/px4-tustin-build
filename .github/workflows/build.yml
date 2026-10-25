@@ -1,0 +1,38 @@
+name: Build PX4 for Tustin Mach
+
+  on:
+    workflow_dispatch:
+      inputs:
+        px4_ref:
+          description: "PX4-Autopilot 的 branch / tag / commit"
+          required: false
+          default: main
+
+  jobs:
+    build:
+      runs-on: ubuntu-22.04
+      timeout-minutes: 120
+      steps:
+        - name: Checkout PX4-Autopilot
+          uses: actions/checkout@v4
+          with:
+            repository: PX4/PX4-Autopilot
+            ref: ${{ inputs.px4_ref }}
+            submodules: recursive
+            fetch-depth: 1
+
+        - name: Install build dependencies
+          run: bash Tools/setup/ubuntu.sh --no-sim-tools
+
+        - name: Build tustin_mach_default
+          run: make tustin_mach_default -j"$(nproc)"
+
+        - name: Show firmware
+          run: ls -lh build/tustin_mach_default/tustin_mach_default.px4
+
+        - name: Upload firmware
+          uses: actions/upload-artifact@v4
+          with:
+            name: tustin_mach_default
+            path: build/tustin_mach_default/tustin_mach_default.px4
+            if-no-files-found: error
